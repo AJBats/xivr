@@ -132,6 +132,15 @@ namespace xivr
         [DllImport("xivr_main.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void UpdateController(UpdateControllerInput controllerCallback);
 
+        [DllImport("xivr_main.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void EnableTrace(bool enableTrace);
+
+        [DllImport("xivr_main.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void TraceBeginBlock([In, MarshalAs(UnmanagedType.LPUTF8Str)] string c, [In, MarshalAs(UnmanagedType.LPUTF8Str)] string n);
+
+        [DllImport("xivr_main.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void TraceEndBlock([In, MarshalAs(UnmanagedType.LPUTF8Str)] string c, [In, MarshalAs(UnmanagedType.LPUTF8Str)] string n);
+
 
 
 
@@ -149,6 +158,7 @@ namespace xivr
         private bool enableVR = true;
         private bool enableFloatingHUD = true;
         private bool forceFloatingScreen = false;
+        private bool tracing = false;
         private int gameMode = 0;
         private int curEye = 0;
         private int[] nextEye = { 1, 0 };

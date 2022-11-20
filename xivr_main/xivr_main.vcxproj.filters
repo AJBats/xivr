@@ -57,6 +57,9 @@
     <ClInclude Include="Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ffxivRenderTargetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>

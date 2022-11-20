@@ -1,7 +1,12 @@
 #include "framework.h"
+#include "trace.h"
+#include <ctime>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <fstream>
+
 std::ofstream myfile;
 stDevice* device = nullptr;
 stRenderTargetManager* rtManager = nullptr;
@@ -25,6 +30,7 @@ bool enabled = false;
 int threadedEye = 0;
 bool logging = false;
 int swapEyes[] = { 1, 0 };
+bool g_Trace = false;
 
 Configuration cfg = Configuration();
 simpleVR svr = simpleVR(&cfg);
@@ -56,6 +62,9 @@ extern "C"
 	__declspec(dllexport) void SetTexture();
 	__declspec(dllexport) POINT GetBufferSize();
 	__declspec(dllexport) void ResizeWindow(HWND hwnd, int width, int height);
+	__declspec(dllexport) void EnableTrace(bool enableTrace);
+	__declspec(dllexport) void TraceBeginBlock(const char* c, const char* n);
+	__declspec(dllexport) void TraceEndBlock(const char* c, const char* n);
 
 	__declspec(dllexport) bool SetActiveJSON(const char*, int size);
 	__declspec(dllexport) void UpdateController(UpdateControllerInput controllerCallback);
@@ -400,12 +409,18 @@ __declspec(dllexport) void SetThreadedEye(int eye)
 
 __declspec(dllexport) void RenderVR()
 {
+	XIVTR_BEGIN("dllmain", "RenderVR");
+
 	if(enabled && threadedEye == 1)
 		svr.Render(BackBufferCopyShared[0].pTexture, BackBufferCopyShared[1].pTexture);
+
+	XIVTR_END("dllmain", "RenderVR");
 }
 
 __declspec(dllexport) void RenderUI(bool enableVR, bool enableFloatingHUD)
 {
+	XIVTR_BEGIN("dllmain", "RenderUI");
+
 	if (enabled)
 	{
 		DirectX::XMMATRIX projectionMatrix;
@@ -465,10 +480,14 @@ __declspec(dllexport) void RenderUI(bool enableVR, bool enableFloatingHUD)
 		//rend->DoRender(viewport, BackBufferCopy[threadedEye].pRenderTarget, uiRenderTarget.pShaderResource, projectionMatrix, viewMatrix);
 		//rend->DoRender(viewport, BackBuffer.pRenderTarget, uiRenderTarget.pShaderResource, projectionMatrix, viewMatrix);
 	}
+
+	XIVTR_END("dllmain", "RenderUI");
 }
 
 __declspec(dllexport) void RenderFloatingScreen()
 {
+	XIVTR_BEGIN("dllmain", "RenderFloatingScreen");
+
 	if (enabled)
 	{
 		ID3D11Resource* bbResource = nullptr;
@@ -492,6 +511,8 @@ __declspec(dllexport) void RenderFloatingScreen()
 		//rend->DoRender(viewport, BackBufferCopy[threadedEye].pRenderTarget, uiGradiant.pShaderResource, projectionMatrix, viewMatrix);
 		rend->DoRender(viewport, BackBufferCopy[threadedEye].pRenderTarget, uiRenderTarget[0].pShaderResource, projectionMatrix, viewMatrix);
 	}
+
+	XIVTR_END("dllmain", "RenderFloatingScreen");
 }
 
 
@@ -536,6 +557,43 @@ __declspec(dllexport) void ResizeWindow(HWND hwnd, int width, int height)
 	}
 }
 
+__declspec(dllexport) void EnableTrace(bool enableTrace)
+{
+#ifdef MTR_ENABLED
+	if (g_Trace == false && enableTrace == true)
+	{
+		struct tm newtime;
+		time_t now = time(0);
+		localtime_s(&newtime, &now);
+		std::ostringstream oss;
+		oss << std::put_time(&newtime, "Trace_%d-%m-%Y_%H-%M-%S.json");
+
+		//auto t = std::time(nullptr);
+		//auto tm = *std::localtime(&t);
+		//std::ostringstream oss;
+		//oss << std::put_time(&tm, "Trace_%d-%m-%Y_%H-%M-%S.json");
+		auto str = oss.str();
+		mtr_init(oss.str().c_str());
+	}
+	else if (g_Trace == true && enableTrace == false)
+	{
+		mtr_shutdown();
+	}
+
+	g_Trace = enableTrace;
+#endif // MTR_ENABLED
+}
+
+__declspec(dllexport) void TraceBeginBlock(const char* c, const char* n)
+{
+	XIVTR_BEGIN(c, n);
+}
+
+__declspec(dllexport) void TraceEndBlock(const char* c, const char* n)
+{
+	XIVTR_END(c, n);
+}
+
 __declspec(dllexport) bool SetActiveJSON(const char* filePath, int size)
 {
 	if (svr.isEnabled())
@@ -553,6 +611,8 @@ __declspec(dllexport) bool SetActiveJSON(const char* filePath, int size)
 
 __declspec(dllexport) void UpdateController(UpdateControllerInput controllerCallback)
 {
+	XIVTR_BEGIN("dllmain", "UpdateController");
+
 	if (svr.isEnabled())
 	{
 		vr::VRActiveActionSet_t actionSet = { 0 };
@@ -665,4 +725,6 @@ __declspec(dllexport) void UpdateController(UpdateControllerInput controllerCall
 				controllerCallback(buttonLayout::xbox_select, analogActionData, digitalActionData);
 		}
 	}
+
+	XIVTR_END("dllmain", "UpdateController");
 }

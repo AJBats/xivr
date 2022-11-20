@@ -243,6 +243,13 @@ namespace xivr
                         cfg.Save(); doUpdate = true;
                         break;
                     }
+                case "trace":
+                    {
+                        float.TryParse(regex.Groups[2].Value, out var amount);
+                        xivr_hooks.EnableTrace(Convert.ToBoolean(amount));
+                        break;
+                    }
+
             }
         }
 
