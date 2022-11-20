@@ -141,9 +141,6 @@ namespace xivr
         [DllImport("xivr_main.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void TraceEndBlock([In, MarshalAs(UnmanagedType.LPUTF8Str)] string c, [In, MarshalAs(UnmanagedType.LPUTF8Str)] string n);
 
-
-
-
         byte[] GetThreadedDataASM =
             {
                 0x55, // push rbp
