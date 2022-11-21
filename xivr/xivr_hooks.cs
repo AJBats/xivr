@@ -366,7 +366,8 @@ namespace xivr
 
         int timer = 100;
         public void Update(Dalamud.Game.Framework framework_)
-        {
+        {            
+            TraceBeginBlock("xivr_hooks", $"Update curEye {curEye}");
             if (hooksSet)
             {
                 UpdateController(controllerCallback);
@@ -393,6 +394,8 @@ namespace xivr
                 curEye = nextEye[curEye];
                 //SetFramePose();
             }
+
+            TraceEndBlock("xivr_hooks", "Update");
         }
 
         public void ForceFloatingScreen(bool forceFloating)
@@ -640,6 +643,8 @@ namespace xivr
 
         private void DXGIPresentFn(UInt64 a, UInt64 b)
         {
+            TraceBeginBlock("xivr_hooks", "DXGIPresentFn");
+
             if (forceFloatingScreen)
             {
                 RenderUI(false, false);
@@ -654,6 +659,8 @@ namespace xivr
                 SetTexture();
                 RenderVR();
             }
+
+            TraceEndBlock("xivr_hooks", "DXGIPresentFn");
         }
 
 
@@ -676,9 +683,11 @@ namespace xivr
 
         private void CamManagerSetMatrixFn(UInt64 a)
         {
+            TraceBeginBlock("xivr_hooks", "CamManagerSetMatrixFn");
             overrideFromParent.Push(true);
             CamManagerSetMatrixHook!.Original(a);
             overrideFromParent.Pop();
+            TraceEndBlock("xivr_hooks", "CamManagerSetMatrixFn");
         }
 
 
@@ -701,9 +710,11 @@ namespace xivr
 
         private void CSUpdateConstBufFn(UInt64 a, UInt64 b)
         {
+            TraceBeginBlock("xivr_hooks", "CSUpdateConstBufFn");
             overrideFromParent.Push(true);
             CSUpdateConstBufHook!.Original(a, b);
             overrideFromParent.Pop();
+            TraceEndBlock("xivr_hooks", "CSUpdateConstBufFn");
         }
 
 
@@ -726,6 +737,8 @@ namespace xivr
 
         private void SetUIProjFn(UInt64 a, UInt64 b)
         {
+            TraceBeginBlock("xivr_hooks", "SetUIProjFn");
+
             bool overrideFn = (overrideFromParent.Count == 0) ? false : overrideFromParent.Peek();
             if (overrideFn)
             {
@@ -735,6 +748,8 @@ namespace xivr
             }
 
             SetUIProjHook!.Original(a, b);
+
+            TraceEndBlock("xivr_hooks", "SetUIProjFn");
         }
 
 
@@ -763,6 +778,8 @@ namespace xivr
         //----
         private void CalculateViewMatrixFn(UInt64 a)
         {
+            TraceBeginBlock("xivr_hooks", "CalculateViewMatrixFn");
+
             IntPtr gameViewMatrixAddr = (IntPtr)(a + 0xA0);
             SafeMemory.Write<Matrix4x4>(gameViewMatrixAddr, Matrix4x4.Identity);
             CalculateViewMatrixHook!.Original(a);
@@ -806,6 +823,8 @@ namespace xivr
                     SafeMemory.Write<Matrix4x4>(gameViewMatrixAddr, gameViewMatrix);
                 }
             }
+
+            TraceEndBlock("xivr_hooks", "CalculateViewMatrixFn");
         }
 
 
@@ -829,6 +848,8 @@ namespace xivr
 
         private void UpdateRotationFn(UInt64 a)
         {
+            TraceBeginBlock("xivr_hooks", "UpdateRotationFn");
+
             GameCamera* gameCamera = (GameCamera*)(a + 0x10);
             if (gameCamera != null && forceFloatingScreen == false)
             {
@@ -863,6 +884,8 @@ namespace xivr
             {
                 UpdateRotationHook!.Original(a);
             }
+
+            TraceEndBlock("xivr_hooks", "UpdateRotationFn");
         }
 
 
@@ -886,6 +909,8 @@ namespace xivr
 
         private float* MakeProjectionMatrix2Fn(UInt64 a, float b, float c, float d, float e)
         {
+            TraceBeginBlock("xivr_hooks", "MakeProjectionMatrix2Fn");
+
             bool overrideMatrix = (overrideFromParent.Count == 0) ? false : overrideFromParent.Peek();
             float* retVal = MakeProjectionMatrix2Hook!.Original(a, b, c, d, e);
             if (enableVR && enableFloatingHUD && overrideMatrix && forceFloatingScreen == false)
@@ -901,6 +926,8 @@ namespace xivr
                     SafeMemory.Write<Matrix4x4>((IntPtr)retVal, gameProjectionMatrix[curEye]);
                 }
             }
+
+            TraceEndBlock("xivr_hooks", "MakeProjectionMatrix2Fn");
             return retVal;
         }
 
@@ -924,12 +951,16 @@ namespace xivr
 
         private float* CSMakeProjectionMatrixFn(UInt64 a, float b, float c, float d, float e)
         {
+            TraceBeginBlock("xivr_hooks", "CSMakeProjectionMatrixFn");
+
             bool overrideMatrix = (overrideFromParent.Count == 0) ? false : overrideFromParent.Peek();
             if (enableVR && enableFloatingHUD && overrideMatrix && forceFloatingScreen == false)
             {
                 b = 2.0f;
             }
             float* retVal = CSMakeProjectionMatrixHook!.Original(a, b, c, d, e);
+
+            TraceEndBlock("xivr_hooks", "CSMakeProjectionMatrixFn");
             return retVal;
         }
 
@@ -953,6 +984,8 @@ namespace xivr
 
         private void RenderThreadSetRenderTargetFn(UInt64 a, UInt64 b)
         {
+            TraceBeginBlock("xivr_hooks", "RenderThreadSetRenderTargetFn");
+
             if ((b + 0x8) != 0)
             {
                 Structures.Texture* rendTrg = *(Structures.Texture**)(b + 0x8);
@@ -962,6 +995,8 @@ namespace xivr
                     SetThreadedEye(1);
             }
             RenderThreadSetRenderTargetHook!.Original(a, b);
+
+            TraceEndBlock("xivr_hooks", "RenderThreadSetRenderTargetFn");
         }
 
 
@@ -985,6 +1020,8 @@ namespace xivr
 
         private void NamePlateDrawFn(AddonNamePlate* a)
         {
+            TraceBeginBlock("xivr_hooks", "NamePlateDrawFn");
+
             if (enableVR)
             {
                 //----
@@ -1013,6 +1050,8 @@ namespace xivr
             }
 
             NamePlateDrawHook!.Original(a);
+
+            TraceEndBlock("xivr_hooks", "NamePlateDrawFn");
         }
 
 

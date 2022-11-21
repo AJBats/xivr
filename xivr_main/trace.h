@@ -1,5 +1,13 @@
 #pragma once
 
+// Use in conjuction with: 
+// https://github.com/hrydgard/minitrace
+// 
+// Configure minitrace with:
+// cmake -DCMAKE_C_FLAGS="-DMTR_COPY_EVENT_CATEGORY_AND_NAME" ..
+// This will allow traces from C# xivr_hooks to function correctly at
+// the cost of small perf hit per trace block.
+
 // uncomment to enable tracing
 //#define MTR_ENABLED
 

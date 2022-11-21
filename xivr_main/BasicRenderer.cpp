@@ -1,4 +1,5 @@
 #include "BasicRenderer.h"
+#include "trace.h"
 
 BasicRenderer::BasicRenderer(Configuration* config) : dev(nullptr), devcon(nullptr), clearColor(), cfg(config)
 {
@@ -509,6 +510,7 @@ void BasicRenderer::SetMousePosition(HWND hwnd, int width, int height)
 
 void BasicRenderer::DoRender(D3D11_VIEWPORT viewport, ID3D11RenderTargetView* rtv, ID3D11ShaderResourceView* srv, DirectX::XMMATRIX projectionMatrix, DirectX::XMMATRIX viewMatrix, bool isOrthog)
 {
+	XIVTR_BEGIN("BasicRenderer", "DoRender");
 	UINT Stride = sizeof(VertexType);
 	UINT Offset = 0;
 
@@ -568,6 +570,8 @@ void BasicRenderer::DoRender(D3D11_VIEWPORT viewport, ID3D11RenderTargetView* rt
 		devcon->IASetIndexBuffer(pIBuffer, DXGI_FORMAT_R16_UINT, 0);
 		devcon->DrawIndexed(102, 0, 0);
 	}
+
+	XIVTR_END("BasicRenderer", "DoRender");
 }
 
 void BasicRenderer::Release()

@@ -568,10 +568,6 @@ __declspec(dllexport) void EnableTrace(bool enableTrace)
 		std::ostringstream oss;
 		oss << std::put_time(&newtime, "Trace_%d-%m-%Y_%H-%M-%S.json");
 
-		//auto t = std::time(nullptr);
-		//auto tm = *std::localtime(&t);
-		//std::ostringstream oss;
-		//oss << std::put_time(&tm, "Trace_%d-%m-%Y_%H-%M-%S.json");
 		auto str = oss.str();
 		mtr_init(oss.str().c_str());
 	}

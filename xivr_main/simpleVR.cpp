@@ -1,4 +1,5 @@
 #include "simpleVR.h"
+#include "trace.h"
 
 
 simpleVR::simpleVR(Configuration* config) : cfg(config)
@@ -155,6 +156,7 @@ POINT simpleVR::GetBufferSize()
 
 void simpleVR::SetFramePose()
 {
+	XIVTR_BEGIN("simpleVR", "SetFramePose");
 	if (openVRSession && _isConnected)
 	{
 		static int lContNum = 0;
@@ -278,6 +280,8 @@ void simpleVR::SetFramePose()
 
 		controller.SetTracking();
 	}
+
+	XIVTR_END("simpleVR", "SetFramePose");
 }
 
 uMatrix simpleVR::GetFramePose(poseType pose_type, int eye)
@@ -307,6 +311,7 @@ uMatrix simpleVR::GetFramePose(poseType pose_type, int eye)
 
 void simpleVR::Render(ID3D11Texture2D* leftEye, ID3D11Texture2D* rightEye)
 {
+	XIVTR_BEGIN("simpleVR", "Render");
 	if (openVRSession && _isConnected)
 	{
 		float colorA[] = { 0, 1, 0, 1 };
@@ -335,6 +340,7 @@ void simpleVR::Render(ID3D11Texture2D* leftEye, ID3D11Texture2D* rightEye)
 
 		SetFramePose();
 	}
+	XIVTR_END("simpleVR", "Render");
 }
 
 void simpleVR::WaitGetPoses()
