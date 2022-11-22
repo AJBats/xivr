@@ -18,10 +18,12 @@ extern bool g_Trace;
 
 #define XIVTR_BEGIN(c, n) if(g_Trace) MTR_BEGIN(c, n)
 #define XIVTR_END(c, n) if(g_Trace) MTR_END(c, n)
+#define XIVTR_INSTANT(c, n) if(g_Trace) MTR_INSTANT(c, n)
 
 #else // MTR_ENABLED
 
 #define XIVTR_BEGIN(c, n)
 #define XIVTR_END(c, n)
+#define XIVTR_INSTANT(c, n)
 
 #endif // MTR_ENABLED
