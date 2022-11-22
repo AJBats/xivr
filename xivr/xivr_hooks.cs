@@ -532,6 +532,7 @@ namespace xivr
         }
         private void PushbackUIFn(UInt64 a, UInt64 b)
         {
+            TraceBeginBlock("xivr_hooks", "PushbackUIFn");
             Structures.Texture* texture = GetUIRenderTexture(curEye);
             UInt64 threadedOffset = GetThreadedOffset();
             SetRenderTargetFn!(threadedOffset, 1, &texture, 0, 0, 0);
@@ -545,6 +546,7 @@ namespace xivr
             overrideFromParent.Push(true);
             PushbackUIHook!.Original(a, b);
             overrideFromParent.Pop();
+            TraceEndBlock("xivr_hooks", "PushbackUIFn");
         }
 
 
