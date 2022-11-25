@@ -9,7 +9,7 @@
 // the cost of small perf hit per trace block.
 
 // uncomment to enable tracing
-//#define MTR_ENABLED
+#define MTR_ENABLED
 
 #ifdef MTR_ENABLED
 #include "minitrace.h"
