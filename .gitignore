@@ -1,8 +1,8 @@
-needs/*
-openvr/*
-minitrace/*
-xivr/bin/*
-xivr/obj/*
-xivr_main/bin/*
-xivr_main/x64/*
-.vs/*
+.git/
+.vs/
+bin
+obj
+x64
+packages
+openvr
+minitrace
